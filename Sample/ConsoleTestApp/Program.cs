@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ConsoleTestApp;
@@ -67,6 +68,26 @@ namespace Clients
 
             private async Task SignIn()
             {
+
+                var client1 = new HttpClient();
+
+                var disco = await client1.GetDiscoveryDocumentAsync(Constants.Authority);
+                if (disco.IsError)
+                {
+                    Console.WriteLine(disco.Error);
+                    return;
+                }
+
+                // request token
+                var tokenResponse = await client1.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+                {
+                    Address = disco.TokenEndpoint,
+                    ClientId = "winconsole",
+                    Scope = "openid profile",
+                    ClientCredentialStyle = ClientCredentialStyle.AuthorizationHeader,
+                    GrantType = "code"
+                });
+                                                   
                 // create a redirect URI using the custom redirect uri
                 string redirectUri = string.Format(CustomUriScheme + "://callback");
                 Console.WriteLine("redirect URI: " + redirectUri);
