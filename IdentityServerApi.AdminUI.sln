@@ -7,21 +7,25 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5B02D3E0-9E2B-41B3-9970-06CECD44B87F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Admin", "src\IdentityServerApi.Admin\IdentityServerApi.Admin.csproj", "{9E670093-2CE8-434B-B5DC-E6351B22CD5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Admin", "src\IdentityServerApi.Admin\IdentityServerApi.Admin.csproj", "{9E670093-2CE8-434B-B5DC-E6351B22CD5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.STS.Identity", "src\IdentityServerApi.STS.Identity\IdentityServerApi.STS.Identity.csproj", "{3099EBD6-2C50-4E6F-8D26-1272FDDA277B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.STS.Identity", "src\IdentityServerApi.STS.Identity\IdentityServerApi.STS.Identity.csproj", "{3099EBD6-2C50-4E6F-8D26-1272FDDA277B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Admin.Api", "src\IdentityServerApi.Admin.Api\IdentityServerApi.Admin.Api.csproj", "{BF350B2F-0D81-483B-A87D-74E302B7A1B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Admin.Api", "src\IdentityServerApi.Admin.Api\IdentityServerApi.Admin.Api.csproj", "{BF350B2F-0D81-483B-A87D-74E302B7A1B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Admin.EntityFramework.Shared", "src\IdentityServerApi.Admin.EntityFramework.Shared\IdentityServerApi.Admin.EntityFramework.Shared.csproj", "{9ACEE5D7-E282-4332-A4EA-52E9EBBE07C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Admin.EntityFramework.Shared", "src\IdentityServerApi.Admin.EntityFramework.Shared\IdentityServerApi.Admin.EntityFramework.Shared.csproj", "{9ACEE5D7-E282-4332-A4EA-52E9EBBE07C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Admin.EntityFramework.MySql", "src\IdentityServerApi.Admin.EntityFramework.MySql\IdentityServerApi.Admin.EntityFramework.MySql.csproj", "{EF3EC456-48AC-43F1-A334-CF49C01F8F4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Admin.EntityFramework.MySql", "src\IdentityServerApi.Admin.EntityFramework.MySql\IdentityServerApi.Admin.EntityFramework.MySql.csproj", "{EF3EC456-48AC-43F1-A334-CF49C01F8F4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Admin.EntityFramework.PostgreSQL", "src\IdentityServerApi.Admin.EntityFramework.PostgreSQL\IdentityServerApi.Admin.EntityFramework.PostgreSQL.csproj", "{39C00105-4743-45A8-915C-E0AE25F6E5FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Admin.EntityFramework.PostgreSQL", "src\IdentityServerApi.Admin.EntityFramework.PostgreSQL\IdentityServerApi.Admin.EntityFramework.PostgreSQL.csproj", "{39C00105-4743-45A8-915C-E0AE25F6E5FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Admin.EntityFramework.SqlServer", "src\IdentityServerApi.Admin.EntityFramework.SqlServer\IdentityServerApi.Admin.EntityFramework.SqlServer.csproj", "{B8B3EFF1-D03F-4A90-811C-6C2A3D04BB3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Admin.EntityFramework.SqlServer", "src\IdentityServerApi.Admin.EntityFramework.SqlServer\IdentityServerApi.Admin.EntityFramework.SqlServer.csproj", "{B8B3EFF1-D03F-4A90-811C-6C2A3D04BB3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerApi.Shared", "src\IdentityServerApi.Shared\IdentityServerApi.Shared.csproj", "{2FA69285-E647-419A-9294-230002ABC8EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServerApi.Shared", "src\IdentityServerApi.Shared\IdentityServerApi.Shared.csproj", "{2FA69285-E647-419A-9294-230002ABC8EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{DF44FFE1-6D53-4FBA-BDC7-DFEAF28658DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorTestProject", "Sample\BlazorTestProject\BlazorTestProject.csproj", "{037822DA-7789-485A-B1DC-94A0BD9F9774}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,12 +145,21 @@ Global
 		{2FA69285-E647-419A-9294-230002ABC8EF}.Release|x64.Build.0 = Release|Any CPU
 		{2FA69285-E647-419A-9294-230002ABC8EF}.Release|x86.ActiveCfg = Release|Any CPU
 		{2FA69285-E647-419A-9294-230002ABC8EF}.Release|x86.Build.0 = Release|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Debug|x64.Build.0 = Debug|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Debug|x86.Build.0 = Debug|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Release|x64.ActiveCfg = Release|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Release|x64.Build.0 = Release|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Release|x86.ActiveCfg = Release|Any CPU
+		{037822DA-7789-485A-B1DC-94A0BD9F9774}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {549F6BA2-7BF0-4104-9088-47D242078F31}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9E670093-2CE8-434B-B5DC-E6351B22CD5A} = {5B02D3E0-9E2B-41B3-9970-06CECD44B87F}
@@ -157,5 +170,9 @@ Global
 		{39C00105-4743-45A8-915C-E0AE25F6E5FE} = {5B02D3E0-9E2B-41B3-9970-06CECD44B87F}
 		{B8B3EFF1-D03F-4A90-811C-6C2A3D04BB3B} = {5B02D3E0-9E2B-41B3-9970-06CECD44B87F}
 		{2FA69285-E647-419A-9294-230002ABC8EF} = {5B02D3E0-9E2B-41B3-9970-06CECD44B87F}
+		{037822DA-7789-485A-B1DC-94A0BD9F9774} = {DF44FFE1-6D53-4FBA-BDC7-DFEAF28658DB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {549F6BA2-7BF0-4104-9088-47D242078F31}
 	EndGlobalSection
 EndGlobal
