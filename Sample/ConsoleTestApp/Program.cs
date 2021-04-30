@@ -82,12 +82,23 @@ namespace Clients
                 var tokenResponse = await client1.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
                 {
                     Address = disco.TokenEndpoint,
-                    ClientId = "winconsole",
-                    Scope = "openid profile",
-                    ClientCredentialStyle = ClientCredentialStyle.AuthorizationHeader,
-                    GrantType = "code"
+                    ClientId = "winconsoleId",
+                    Scope = "profile",
+                    //ClientCredentialStyle = ClientCredentialStyle.AuthorizationHeader,
+                    ClientSecret = "secret",
+                    //GrantType = "authorization_code",
                 });
-                                                   
+                if (tokenResponse.IsError)
+                {
+                    Console.WriteLine(tokenResponse.Error);
+                    return;
+                }
+
+                Console.WriteLine($"\n\n=======================================\n\n");
+                Console.WriteLine(tokenResponse.Json);
+                Console.WriteLine($"\n\nOK\n\n");
+                Console.ReadKey();
+                return;
                 // create a redirect URI using the custom redirect uri
                 string redirectUri = string.Format(CustomUriScheme + "://callback");
                 Console.WriteLine("redirect URI: " + redirectUri);
@@ -95,7 +106,7 @@ namespace Clients
                 var options = new OidcClientOptions
                 {
                     Authority = Constants.Authority,
-                    ClientId = "winconsole",
+                    ClientId = "winconsoleId",
                     Scope = "openid profile",
                     RedirectUri = redirectUri,
                 };
