@@ -784,7 +784,8 @@ namespace IdentityServerApi.STS.Identity.Controllers
 
             var vm = new LoggedOutViewModel
             {
-                AutomaticRedirectAfterSignOut = !string.IsNullOrWhiteSpace(logout?.PostLogoutRedirectUri), //AccountOptions.AutomaticRedirectAfterSignOut,
+                AutomaticRedirectAfterSignOut = !string.IsNullOrWhiteSpace(logout?.PostLogoutRedirectUri),
+                //AccountOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
                 ClientName = string.IsNullOrEmpty(logout?.ClientName) ? logout?.ClientId : logout?.ClientName,
                 SignOutIframeUrl = logout?.SignOutIFrameUrl,
