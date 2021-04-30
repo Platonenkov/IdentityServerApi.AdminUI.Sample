@@ -68,38 +68,7 @@ namespace Clients
 
             private async Task SignIn()
             {
-
-                var client1 = new HttpClient();
-
-                var disco = await client1.GetDiscoveryDocumentAsync(Constants.Authority);
-                if (disco.IsError)
-                {
-                    Console.WriteLine(disco.Error);
-                    return;
-                }
-
-                // request token
-                var tokenResponse = await client1.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-                    ClientId = "winconsoleId",
-                    Scope = "profile",
-                    //ClientCredentialStyle = ClientCredentialStyle.AuthorizationHeader,
-                    ClientSecret = "secret",
-                    //GrantType = "authorization_code",
-                });
-                if (tokenResponse.IsError)
-                {
-                    Console.WriteLine(tokenResponse.Error);
-                    return;
-                }
-
-                Console.WriteLine($"\n\n=======================================\n\n");
-                Console.WriteLine(tokenResponse.Json);
-                Console.WriteLine($"\n\nOK\n\n");
-                Console.ReadKey();
-                return;
-                // create a redirect URI using the custom redirect uri
+// create a redirect URI using the custom redirect uri
                 string redirectUri = string.Format(CustomUriScheme + "://callback");
                 Console.WriteLine("redirect URI: " + redirectUri);
 
@@ -107,7 +76,7 @@ namespace Clients
                 {
                     Authority = Constants.Authority,
                     ClientId = "winconsoleId",
-                    Scope = "openid profile",
+                    Scope = "IdentityServerApiId_api",
                     RedirectUri = redirectUri,
                 };
 
