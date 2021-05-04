@@ -2,9 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityModel.Client;
-using Newtonsoft.Json.Linq;
 
-namespace ConsoleClient
+namespace Service_To_Service
 {
     public class Program
     {
@@ -25,10 +24,10 @@ namespace ConsoleClient
             var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
                 Address = disco.TokenEndpoint,
-                ClientId = "winconsoleId",
+                ClientId = "service_to_service_id",
                 ClientSecret = "secret",
 
-                Scope = "openid profile"
+                Scope = "service_to_service"
             });
 
             if (tokenResponse.IsError)

@@ -234,7 +234,6 @@ namespace IdentityServerApi.Admin.EntityFramework.Shared.Helpers
                 await context.ApiResources.AddAsync(resource.ToEntity());
             }
 
-
             foreach (var client in identityServerDataConfiguration.Clients)
             {
                 var exits = await context.Clients.AnyAsync(a => a.ClientId == client.ClientId);
@@ -260,11 +259,3 @@ namespace IdentityServerApi.Admin.EntityFramework.Shared.Helpers
         }
     }
 }
-
-
-
-
-
-
-
-
