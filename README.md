@@ -5,9 +5,22 @@ dotnet new skoruba.is4admin --name IdentityServerApi --title MyProject --adminem
 
 
 ### For Api
-services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+add nuget IdentityServer4.AccessTokenValidation
+
+```C#
+services.AddAuthentication()
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config =>
     {
       config.Authority = "https://localhost:44310";
       config.Audience = "ApiName";
     }
+    
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiPolicy", policy =>
+    {
+        //policy.RequireAuthenticatedUser();
+        policy.RequireClaim("Scope","api1");
+    });
+});
+```
