@@ -28,7 +28,7 @@ namespace ConsoleApiGetTest
                 ClientId = "Api1_client_id",
                 ClientSecret = "secret",
                 
-                Scope = "api1"
+                Scope = "service_to_service api1"
             });
 
             if (tokenResponse.IsError)

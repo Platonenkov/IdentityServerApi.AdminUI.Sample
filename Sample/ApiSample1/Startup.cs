@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ApiSample1
@@ -28,14 +29,15 @@ namespace ApiSample1
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddAuthentication("Bearer")
-               .AddJwtBearer("Bearer", config =>
+            services.AddAuthentication()
+               .AddJwtBearer(IdentityServerAuthenticationDefaults.AuthenticationScheme, config =>
                 {
                     config.Authority = "https://localhost:44310";
-                    config.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = false, 
-                    };
+                    config.Audience = "api1";
+                    //config.TokenValidationParameters = new TokenValidationParameters
+                    //{
+                    //    ValidateAudience = false, 
+                    //};
 
                 });
 
@@ -44,7 +46,7 @@ namespace ApiSample1
                 options.AddPolicy("ApiPolicy", policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("api1");
+                    policy.RequireClaim("Scope","open_api");
                 });
             });
 
@@ -95,7 +97,7 @@ namespace ApiSample1
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers()
-                   .RequireAuthorization("ApiPolicy"); ;
+                   /*.RequireAuthorization("ApiPolicy"); */;
             });
         }
     }
