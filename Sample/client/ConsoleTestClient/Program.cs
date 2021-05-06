@@ -10,7 +10,7 @@ namespace ConsoleTestClient
 {
     class Program
     {
-        private const string SampleApi = "https://localhost:44365/WeatherForecast";
+        private const string SampleApi = "https://localhost:44365";
         public const string Authority = "https://localhost:44310";
         static OidcClient _oidcClient;
         static HttpClient _apiClient = new HttpClient { BaseAddress = new Uri(SampleApi) };
@@ -41,6 +41,7 @@ namespace ConsoleTestClient
                 ClientId = "console_pkce",
 
                 RedirectUri = redirectUri,
+                PostLogoutRedirectUri = redirectUri,
                 Scope = "openid profile api1",
                 FilterClaims = false,
                 Browser = browser
@@ -94,25 +95,35 @@ namespace ConsoleTestClient
 
                 Console.Write(menu);
                 var key = Console.ReadKey();
-
-                if (key.Key == ConsoleKey.X) return;
-                if (key.Key == ConsoleKey.C) await CallApi(currentAccessToken);
-                if (key.Key == ConsoleKey.R)
+                try
                 {
-                    var refreshResult = await _oidcClient.RefreshTokenAsync(currentRefreshToken);
-                    if (result.IsError)
+                    if (key.Key == ConsoleKey.X)
                     {
-                        Console.WriteLine($"Error: {refreshResult.Error}");
+                        await _oidcClient.LogoutAsync();
+                        return;
                     }
-                    else
+                    if (key.Key == ConsoleKey.C) await CallApi(currentAccessToken);
+                    if (key.Key == ConsoleKey.R)
                     {
-                        currentRefreshToken = refreshResult.RefreshToken;
-                        currentAccessToken = refreshResult.AccessToken;
+                        var refreshResult = await _oidcClient.RefreshTokenAsync(currentRefreshToken);
+                        if (result.IsError)
+                        {
+                            Console.WriteLine($"Error: {refreshResult.Error}");
+                        }
+                        else
+                        {
+                            currentRefreshToken = refreshResult.RefreshToken;
+                            currentAccessToken = refreshResult.AccessToken;
 
-                        Console.WriteLine("\n\n");
-                        Console.WriteLine($"access token:   {result.AccessToken}");
-                        Console.WriteLine($"refresh token:  {result?.RefreshToken ?? "none"}");
+                            Console.WriteLine("\n\n");
+                            Console.WriteLine($"access token:   {result.AccessToken}");
+                            Console.WriteLine($"refresh token:  {result?.RefreshToken ?? "none"}");
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                 }
             }
         }
@@ -120,7 +131,7 @@ namespace ConsoleTestClient
         private static async Task CallApi(string currentAccessToken)
         {
             _apiClient.SetBearerToken(currentAccessToken);
-            var response = await _apiClient.GetAsync("identity");
+            var response = await _apiClient.GetAsync("WeatherForecast");
 
             if (response.IsSuccessStatusCode)
             {
