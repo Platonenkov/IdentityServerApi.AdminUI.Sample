@@ -42,7 +42,8 @@ namespace ConsoleTestClient
 
                 RedirectUri = redirectUri,
                 PostLogoutRedirectUri = redirectUri,
-                Scope = "openid profile api1",
+                Scope = "openid profile api1 offline_access",
+                
                 FilterClaims = false,
                 Browser = browser
             };

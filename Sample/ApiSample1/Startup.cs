@@ -34,10 +34,10 @@ namespace ApiSample1
                 {
                     config.Authority = "https://localhost:44310";
                     config.Audience = "api1";
-                    //config.TokenValidationParameters = new TokenValidationParameters
-                    //{
-                    //    ValidateAudience = false, 
-                    //};
+                    config.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ClockSkew = TimeSpan.FromSeconds(5),
+                    };
 
                 });
 
@@ -50,25 +50,6 @@ namespace ApiSample1
                 });
             });
 
-            //services.AddCors(config =>
-            //    config.AddPolicy("AllowAll",
-            //        p => p.AllowAnyOrigin()
-            //           .AllowAnyMethod()
-            //           .AllowAnyHeader()
-            //    ));
-            //services.AddMvcCore()
-            //   .AddAuthorization();
-
-            //services.AddAuthentication("Bearer")
-            //   .AddIdentityServerAuthentication(options =>
-            //    {
-            //        options.Authority = "https://localhost:44310";
-            //        options.RequireHttpsMetadata = false;
-
-
-            //        options.ApiSecret = "secret";
-            //        options.ApiName = "api1";
-            //    });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
