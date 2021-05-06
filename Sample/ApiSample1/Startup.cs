@@ -9,9 +9,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ApiSample1
@@ -38,7 +43,6 @@ namespace ApiSample1
                     {
                         ClockSkew = TimeSpan.FromSeconds(5),
                     };
-
                 });
 
             services.AddAuthorization(options =>
@@ -48,7 +52,12 @@ namespace ApiSample1
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("Scope","open_api");
                 });
+                options.AddPolicy("ScacEmail", builder =>
+                {
+                    builder.AddRequirements(new ScacRequirement("ssj.irkut.com"));
+                });
             });
+            services.AddSingleton<AuthorizationHandler<ScacRequirement>, ScacRequirementHandler>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -80,6 +89,34 @@ namespace ApiSample1
                 endpoints.MapControllers()
                    /*.RequireAuthorization("ApiPolicy"); */;
             });
+        }
+        public class ScacRequirement : IAuthorizationRequirement
+        {
+            public ScacRequirement(string email)
+            {
+                Email = email;
+            }
+            public string Email { get; }
+        }
+
+        public class ScacRequirementHandler : AuthorizationHandler<ScacRequirement>
+        {
+            protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ScacRequirement requirement)
+            {
+                var hasClaim = context.User.HasClaim(x => x.Type == ClaimTypes.Email);
+                if (!hasClaim)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var email = context.User.FindFirst(x => x.Type == ClaimTypes.Email).Value;
+                if (email.Split('@')[1].ToLower() == requirement.Email.ToLower())
+                {
+                    context.Succeed(requirement);
+                }
+                Debug.WriteLine(email);
+                return Task.CompletedTask;
+            }
         }
     }
 }

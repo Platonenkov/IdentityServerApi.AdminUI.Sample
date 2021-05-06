@@ -42,12 +42,12 @@ namespace ConsoleTestClient
 
                 RedirectUri = redirectUri,
                 PostLogoutRedirectUri = redirectUri,
-                Scope = "openid profile api1 offline_access",
+                Scope = "openid profile api1 offline_access email",
                 
                 FilterClaims = false,
                 Browser = browser
             };
-
+            
             var serilog = new LoggerConfiguration()
                 .MinimumLevel.Error()
                 .Enrich.FromLogContext()

@@ -12,6 +12,7 @@ namespace ApiSample1.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(AuthenticationSchemes = IdentityServerAuthenticationDefaults.AuthenticationScheme)]
+    [Authorize(Policy = "ScacEmail")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
