@@ -24,3 +24,6 @@ services.AddAuthorization(options =>
     });
 });
 ```
+To Enable Refresh Token:
+- Allow Offline Access in client settings
+- add scope - offline_access
