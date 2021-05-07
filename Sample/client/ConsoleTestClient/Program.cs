@@ -1,19 +1,18 @@
-﻿using IdentityModel.Client;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Helpers;
+using IdentityModel.Client;
 using IdentityModel.OidcClient;
 using Newtonsoft.Json.Linq;
 using Serilog;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 
-namespace ConsoleTestClient
+namespace ConsoleServerLoginClient
 {
     class Program
     {
-        private const string SampleApi = "https://localhost:44365";
-        public const string Authority = "https://localhost:44310";
         static OidcClient _oidcClient;
-        static HttpClient _apiClient = new HttpClient { BaseAddress = new Uri(SampleApi) };
+        static HttpClient _apiClient = new HttpClient { BaseAddress = new Uri(Constants.SampleApi) };
 
         public static async Task Main()
         {
@@ -36,7 +35,7 @@ namespace ConsoleTestClient
 
             var options = new OidcClientOptions
             {
-                Authority = Authority,
+                Authority = Constants.Authority,
 
                 ClientId = "console_pkce",
 
@@ -132,7 +131,7 @@ namespace ConsoleTestClient
         private static async Task CallApi(string currentAccessToken)
         {
             _apiClient.SetBearerToken(currentAccessToken);
-            var response = await _apiClient.GetAsync("WeatherForecast");
+            var response = await _apiClient.GetAsync(Constants.ApiController_1);
 
             if (response.IsSuccessStatusCode)
             {

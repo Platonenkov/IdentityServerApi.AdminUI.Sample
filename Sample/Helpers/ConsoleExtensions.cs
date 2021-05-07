@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Clients
+namespace Helpers
 {
     public static class ConsoleExtensions
     {

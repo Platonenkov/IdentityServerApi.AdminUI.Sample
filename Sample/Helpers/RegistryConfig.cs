@@ -2,9 +2,9 @@
 using System.Reflection;
 using Microsoft.Win32;
 
-namespace ConsoleTestApp
+namespace Helpers
 {
-    class RegistryConfig
+    public class RegistryConfig
     {
         public RegistryConfig(string uriScheme)
         {

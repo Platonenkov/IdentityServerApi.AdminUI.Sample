@@ -1,13 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConsoleTestApp
+namespace Helpers
 {
-    class CallbackManager
+    public class CallbackManager
     {
         private readonly string _name;
 
