@@ -33,10 +33,10 @@ namespace ConsoleServerLoginClient
             var browser = new SystemBrowser(57637);
             string redirectUri = string.Format($"http://127.0.0.1:{browser.Port}");
 
-            var options = new OidcClientOptions
+            var options = new OidcClientOptions()
             {
                 Authority = Constants.Authority,
-
+                
                 ClientId = "console_pkce",
 
                 RedirectUri = redirectUri,
@@ -46,7 +46,7 @@ namespace ConsoleServerLoginClient
                 FilterClaims = false,
                 Browser = browser
             };
-            
+
             var serilog = new LoggerConfiguration()
                 .MinimumLevel.Error()
                 .Enrich.FromLogContext()

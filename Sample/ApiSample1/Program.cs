@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace ApiSample1
 {
@@ -13,14 +14,34 @@ namespace ApiSample1
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            Log.Logger = new LoggerConfiguration()
+               .WriteTo.Console()
+               .CreateBootstrapLogger();
+            Log.Information("Starting up!");
+
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+
+                Log.Information("Stopped cleanly");
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "An unhandled exception occured during bootstrapping");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+               .UseSerilog((context, services, configuration) => configuration
+                   .ReadFrom.Configuration(context.Configuration)
+                   .ReadFrom.Services(services)
+                   .Enrich.FromLogContext()
+                   .WriteTo.Console())
+               .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }

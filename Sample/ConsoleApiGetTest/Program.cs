@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Helpers;
 using IdentityModel.Client;
 using Newtonsoft.Json.Linq;
 
@@ -8,13 +9,12 @@ namespace ConsoleApiGetTest
 {
     class Program
     {
-        public const string Authority = "https://localhost:44310";
         private static async Task Main()
         {
             // discover endpoints from metadata
             var client = new HttpClient();
 
-            var disco = await client.GetDiscoveryDocumentAsync(Authority);
+            var disco = await client.GetDiscoveryDocumentAsync(Constants.Authority);
             if (disco.IsError)
             {
                 Console.WriteLine(disco.Error);
@@ -41,10 +41,10 @@ namespace ConsoleApiGetTest
             Console.WriteLine("\n\n");
 
             // call api
-            var apiClient = new HttpClient();
+            var apiClient = new HttpClient(){ BaseAddress = new Uri(Constants.SampleApi) };
             apiClient.SetBearerToken(tokenResponse.AccessToken);
 
-            var response = await apiClient.GetAsync("https://localhost:44365/WeatherForecast");
+            var response = await apiClient.GetAsync(Constants.ApiController_1);
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine(response.StatusCode);
