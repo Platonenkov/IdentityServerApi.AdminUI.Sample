@@ -1,29 +1,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4.AccessTokenValidation;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using Serilog;
-using Console = System.Console;
 
 namespace ApiSample1
 {
@@ -39,26 +27,47 @@ namespace ApiSample1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #region With oidc client
 
-            services.AddAuthentication(
-                    o =>
-                    {
-                        o.DefaultScheme = IdentityServerAuthenticationDefaults.AuthenticationScheme;
-                        o.DefaultChallengeScheme = "oidc";
-                    })
-               //.AddCookie(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-               .AddOpenIdConnect("oidc", config =>
-                {
-                    config.Authority = "https://localhost:44310";
-                    config.ClientId = "api1";
+            //services.AddAuthentication(
+            //        o =>
+            //        {
+            //            o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //            o.DefaultChallengeScheme = "oidc";
+            //        })
+            //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+            //   .AddOpenIdConnect(
+            //        "oidc", config =>
+            //        {
+            //            config.Authority = "https://localhost:44310";
+            //            config.ClientId = "api1";
 
-                    config.ResponseType = "code";
-                    config.Scope.Add("openid profile email address roles");
-                    config.GetClaimsFromUserInfoEndpoint = true;
-                    config.ClaimActions.MapAll();
-                })
+            //            config.ResponseType = "code";
+            //            config.Scope.Add("openid profile email");
+            //            config.SaveTokens = true;
+            //            config.GetClaimsFromUserInfoEndpoint = true;
+            //            config.ClaimActions.MapAll();
+            //        });
+            //.AddJwtBearer(IdentityServerAuthenticationDefaults.AuthenticationScheme, config =>
+            // {
+            //     config.Authority = "https://localhost:44310";
+            //     config.Audience = "api1";
+            //     //config.TokenValidationParameters = new TokenValidationParameters
+            //     //{
+            //     //    ClockSkew = TimeSpan.FromSeconds(5),
+            //     //};
+            //     config.SaveToken = true;
+            //     config.Configuration = new OpenIdConnectConfiguration()
+            //     {
+            //         AuthorizationEndpoint = "https://localhost:44310",
+            //     };
+            // });
+
+            #endregion
+
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                .AddJwtBearer(IdentityServerAuthenticationDefaults.AuthenticationScheme, config =>
                 {
                     config.Authority = "https://localhost:44310";
@@ -68,38 +77,15 @@ namespace ApiSample1
                     //    ClockSkew = TimeSpan.FromSeconds(5),
                     //};
                     config.SaveToken = true;
-                    config.Configuration = new OpenIdConnectConfiguration()
-                    {
-                        AuthorizationEndpoint = "https://localhost:44310",
-                    };
+                    config.RequireHttpsMetadata = false;
                 });
 
-            #endregion
 
-            //services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-            //   .AddJwtBearer(IdentityServerAuthenticationDefaults.AuthenticationScheme, config =>
-            //    {
-            //    config.Authority = "https://localhost:44310";
-            //        config.Audience = "api1";
-            //        //config.TokenValidationParameters = new TokenValidationParameters
-            //        //{
-            //        //    ClockSkew = TimeSpan.FromSeconds(5),
-            //        //};
-            //    });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiPolicy", policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim("Scope", "open_api");
-                });
-                options.AddPolicy("ScacEmail", builder =>
-                {
-                    builder.AddRequirements(new ScacRequirement("ssj.irkut.com"));
-                });
-            });
-            services.AddSingleton<AuthorizationHandler<ScacRequirement>, ScacRequirementHandler>();
+            services.AddAuthorization();
+
+            services.AddSingleton<IAuthorizationHandler, ScacRequirementHandler>();
+            services.AddSingleton<IAuthorizationPolicyProvider, CustomAuthorizationPolicyProvider>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -132,6 +118,46 @@ namespace ApiSample1
                    /*.RequireAuthorization("ApiPolicy"); */;
             });
         }
+
+
+        #region Policy
+
+        /// <summary>
+        /// Провайдер политик, регистрирует и проверяет наличие
+        /// </summary>
+        public class CustomAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
+        {
+            private readonly AuthorizationOptions _Options;
+
+            public CustomAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options) { _Options = options.Value; }
+
+            #region Overrides of DefaultAuthorizationPolicyProvider
+
+            public override async Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+            {
+                var policy_exist = await base.GetPolicyAsync(policyName);
+                if (policy_exist == null)
+                {
+                    if(policyName == "ScacEmailPolicy")
+                    {
+                        policy_exist = new AuthorizationPolicyBuilder().AddRequirements(new ScacRequirement("ssj.irkut.com")).Build();
+                        _Options.AddPolicy(policyName, policy_exist);
+                    }
+                    if(policyName == "ApiPolicy")
+                    {
+                        policy_exist = new AuthorizationPolicyBuilder().RequireClaim("Scope", "api1").Build();
+                        _Options.AddPolicy(policyName, policy_exist);
+                    }
+                }
+
+                return policy_exist;
+            }
+
+            #endregion
+        }
+        /// <summary>
+        /// Описывает модель требования
+        /// </summary>
         public class ScacRequirement : IAuthorizationRequirement
         {
             public ScacRequirement(string email)
@@ -141,39 +167,14 @@ namespace ApiSample1
             }
             public string Email { get; }
         }
-
+        /// <summary>
+        /// Описывает обработчик требования политики 
+        /// </summary>
         public class ScacRequirementHandler: AuthorizationHandler<ScacRequirement>
         {
-            private readonly IHttpContextAccessor _HttpContextAccessor;
-
-            public ScacRequirementHandler(IHttpContextAccessor http_context_accessor) { _HttpContextAccessor = http_context_accessor; }
             protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ScacRequirement requirement)
             {
                 Log.Information("Handle Requirement check start");
-                
-                var token = _HttpContextAccessor?.HttpContext?.GetTokenAsync("access_token");
-                if (token?.Result != null)
-                {
-                    context.Succeed(requirement);
-                    return Task.CompletedTask;
-                }
-
-                Log.Information("token is null");
-
-                var name = context.User.Identity?.Name ?? context.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                if (name != null)
-                {
-                    if (name.ToLower() == "admin")
-                    {
-                        context.Succeed(requirement);
-                        return Task.CompletedTask;
-                    }
-
-                    Log.Information($"Name is not admin : {name}");
-
-                }
-                Log.Information("name is null");
-
                 var hasClaim = context.User.HasClaim(x => x.Type == ClaimTypes.Email);
                 if (!hasClaim)
                 {
@@ -192,5 +193,7 @@ namespace ApiSample1
                 return Task.CompletedTask;
             }
         }
+
+        #endregion
     }
 }

@@ -28,8 +28,7 @@ namespace ConsoleClientLogin
             "Access Token".ConsoleYellow();
             await Service.CallServiceConsoleAsync(response.AccessToken);
 
-            "Identity Token".ConsoleYellow();
-            await Service.CallServiceConsoleAsync(response.IdentityToken);
+            Console.ReadLine();
         }
 
         static async Task<TokenResponse> RequestTokenAsync()

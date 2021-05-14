@@ -15,7 +15,6 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal"  VerticalAlignment="Top" HorizontalAlignment="Center">
             <Button Content="Login" Width="100" Height="20" Margin="10" Click="Button_login_OnClick"/>
             <Button Content="Logout" Width="100" Height="20" Click="Button_logout_OnClick"/>
-
         </StackPanel>
         <TextBlock Grid.Row="1"
             x:Name="txbMessage"
@@ -36,7 +35,10 @@
                     <TextBox IsReadOnly="True" TextWrapping="Wrap" x:Name="IdentityToken"/>
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Margin="5,10">
-                    <TextBlock Text="Refresh Token"  FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Refresh Token"  FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Button Content="Refresh token" Width="100" Height="20" Margin="10" Click="Refresh_token_Click" />
+                    </StackPanel>
                     <TextBox IsReadOnly="True" TextWrapping="Wrap" x:Name="RefreshToken"/>
                 </StackPanel>
                 <TextBlock Text="User Info" FontWeight="Bold"/>
@@ -53,15 +55,26 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-
-                <Button Click="Button_LoadFromBaseApi_OnClick">
-                    <TextBlock Text="Load from base Api" FontWeight="Bold"/>
-                </Button >
-                <TextBox x:Name="BaseApiTxt"/>
-                <Button Click="Button_LoadFromPoliceApi_OnClick">
-                    <TextBlock Text="Load from police Api" FontWeight="Bold"/>
-                </Button>
-                <TextBox x:Name="PoliceApiTxt"/>
+                <GroupBox Header="Access Token">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Button Click="Button_LoadAccessBaseApi_OnClick">
+                                <TextBlock Text="Load from base Api" FontWeight="Bold"/>
+                            </Button >
+                            <TextBox x:Name="AccessBaseApiTxt"  TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <Button Click="Button_LoadAccessPoliceApi_OnClick">
+                                <TextBlock Text="Load from policy Api" FontWeight="Bold"/>
+                            </Button >
+                            <TextBox x:Name="AccessPoliceApiTxt"  TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -130,19 +130,20 @@ namespace ConsoleServerLoginClient
 
         private static async Task CallApi(string currentAccessToken)
         {
-            _apiClient.SetBearerToken(currentAccessToken);
-            var response = await _apiClient.GetAsync(Constants.ApiController_1);
+            await Service.CallServiceConsoleAsync(currentAccessToken);
+            //_apiClient.SetBearerToken(currentAccessToken);
+            //var response = await _apiClient.GetAsync(Constants.ApiController_1);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var json = JArray.Parse(await response.Content.ReadAsStringAsync());
-                Console.WriteLine("\n\n");
-                Console.WriteLine(json);
-            }
-            else
-            {
-                Console.WriteLine($"Error: {response.ReasonPhrase}");
-            }
+            //if (response.IsSuccessStatusCode)
+            //{
+            //    var json = JArray.Parse(await response.Content.ReadAsStringAsync());
+            //    Console.WriteLine("\n\n");
+            //    Console.WriteLine(json);
+            //}
+            //else
+            //{
+            //    Console.WriteLine($"Error: {response.ReasonPhrase}");
+            //}
         }
     }
 }

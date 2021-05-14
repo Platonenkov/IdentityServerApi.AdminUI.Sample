@@ -1,5 +1,6 @@
 ﻿using IdentityModel.OidcClient;
 using System;
+using System.Linq;
 using System.Windows;
 using Helpers;
 using IdentityModel.OidcClient.Browser;
@@ -13,6 +14,7 @@ namespace WpfWebView2
     {
         private OidcClientOptions _Options;
         private OidcClient _Client;
+        private LoginResult _LoginResult;
         public MainWindow()
         {
             InitializeComponent();
@@ -25,8 +27,7 @@ namespace WpfWebView2
                 Authority = Constants.Authority,
 
                 ClientId = "wpf_sample_id",
-
-                Scope = "openid profile api1 offline_access email",
+                Scope = "openid profile api1 email offline_access",
 
                 RedirectUri = "http://127.0.0.1/sample-wpf-app",
                 Browser = new WpfEmbeddedBrowser(),
@@ -47,10 +48,9 @@ namespace WpfWebView2
             }
             _Client = new OidcClient(_Options);
 
-            LoginResult loginResult;
             try
             {
-                loginResult = await _Client.LoginAsync();
+                _LoginResult = await _Client.LoginAsync();
             }
             catch (Exception exception)
             {
@@ -59,29 +59,28 @@ namespace WpfWebView2
                 return;
             }
 
-            if (loginResult.IsError)
+            if (_LoginResult.IsError)
             {
-                txbMessage.Text = loginResult.Error == "UserCancel" ? "The sign-in window was closed before authorization was completed." : loginResult.Error;
+                txbMessage.Text = _LoginResult.Error == "UserCancel" ? "The sign-in window was closed before authorization was completed." : _LoginResult.Error;
                 Clean();
             }
             else
             {
-                txbMessage.Text = loginResult.User.Identity.Name;
-                RefreshToken.Text = loginResult.RefreshToken;
-                AccessToken.Text = loginResult.AccessToken;
-                IdentityToken.Text = loginResult.IdentityToken;
-                UserInfo.ItemsSource = await Helpers.Service.GetUserInfoAsync(loginResult.AccessToken);
+                var name = _LoginResult.User.Identity.Name;
+                var email = _LoginResult.User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+                txbMessage.Text = $"You are login as\t{name}\t{email}";
+                RefreshToken.Text = _LoginResult.RefreshToken;
+                AccessToken.Text = _LoginResult.AccessToken;
+                IdentityToken.Text = _LoginResult.IdentityToken;
+                UserInfo.ItemsSource = await Helpers.Service.GetUserInfoAsync(_LoginResult.AccessToken);
             }
 
         }
 
         private async void Button_logout_OnClick(object Sender, RoutedEventArgs E)
         {
-            if (_Client is null)
-            {
-                MessageBox.Show(this, "First you must connect to server");
+            if (!CheckClient())
                 return;
-            }
 
             var logout = await _Client.LogoutAsync(new LogoutRequest() { BrowserDisplayMode = DisplayMode.Hidden });
             if (logout.IsError)
@@ -97,20 +96,53 @@ namespace WpfWebView2
             RefreshToken.Text = string.Empty;
             AccessToken.Text = string.Empty;
             IdentityToken.Text = string.Empty;
+            AccessPoliceApiTxt.Text = string.Empty;
+            AccessBaseApiTxt.Text = string.Empty;
             UserInfo.ItemsSource = null;
             _Client = null;
-
+            _LoginResult = null;
         }
 
-        private async void Button_LoadFromBaseApi_OnClick(object Sender, RoutedEventArgs E)
+        private async void Button_LoadAccessPoliceApi_OnClick(object Sender, RoutedEventArgs E)
+        {
+            var response = await Service.CallServiceAsync(AccessToken.Text, Helpers.Constants.ApiController_2);
+            AccessPoliceApiTxt.Text = response;
+        }
+
+        private async void Button_LoadAccessBaseApi_OnClick(object Sender, RoutedEventArgs E)
         {
             var response = await Service.CallServiceAsync(AccessToken.Text, Helpers.Constants.ApiController_1);
-            BaseApiTxt.Text = response;
+            AccessBaseApiTxt.Text = response;
         }
-        private async void Button_LoadFromPoliceApi_OnClick(object Sender, RoutedEventArgs E)
+
+        private async void Refresh_token_Click(object Sender, RoutedEventArgs E)
         {
-            var response = await Service.CallServiceAsync(IdentityToken.Text, Helpers.Constants.ApiController_2);
-            PoliceApiTxt.Text = response;
+            if (!CheckClient()) return;
+
+            var refreshResult = await _Client.RefreshTokenAsync(RefreshToken.Text);
+            if (_LoginResult.IsError)
+            {
+                Console.WriteLine($"Error: {refreshResult.Error}");
+            }
+            else
+            {
+                RefreshToken.Text = refreshResult.RefreshToken;
+                AccessToken.Text = refreshResult.AccessToken;
+
+                Console.WriteLine("\n\n");
+                Console.WriteLine($"access token:   {_LoginResult.AccessToken}");
+                Console.WriteLine($"refresh token:  {_LoginResult?.RefreshToken ?? "none"}");
+            }
+
+        }
+
+        private bool CheckClient(bool showMessage = true)
+        {
+            if (_Client is not null) return true;
+            if(showMessage)
+                MessageBox.Show(this, "first connect to the server");
+            return false;
+
         }
     }
 }

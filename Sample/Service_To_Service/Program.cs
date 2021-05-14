@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Helpers;
 using IdentityModel.Client;
+using Newtonsoft.Json.Linq;
 
 namespace Service_To_Service
 {
     public class Program
     {
-        public const string Authority = "https://localhost:44310";
         private static async Task Main()
         {
             // discover endpoints from metadata
             var client = new HttpClient();
 
-            var disco = await client.GetDiscoveryDocumentAsync(Authority);
+            var disco = await client.GetDiscoveryDocumentAsync(Helpers.Constants.Authority);
             if (disco.IsError)
             {
                 Console.WriteLine(disco.Error);
@@ -40,6 +41,7 @@ namespace Service_To_Service
             Console.WriteLine("\n\n");
 
             // call api
+            //await Service.CallServiceConsoleAsync(tokenResponse.AccessToken);
             //var apiClient = new HttpClient();
             //apiClient.SetBearerToken(tokenResponse.AccessToken);
 

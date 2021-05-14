@@ -41,7 +41,7 @@ namespace ApiSample1.Controllers
     }
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Policy = "ScacEmail")]
+    [Authorize(Policy = "ScacEmailPolicy")]
     public class WeatherForecastPolicyController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

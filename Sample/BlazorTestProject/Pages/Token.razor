@@ -2,7 +2,7 @@
 @using System.Text.Json
 @using IdentityModel.Client
 @inject IJSRuntime JSRuntime
-
+@inject HttpClient Client 
 <AuthorizeView>
     <Authorized>
         <div>
@@ -12,32 +12,47 @@
             </pre>
             <br />
             <b>CognitoUser</b><br />
-            <pre>
+            <div style="width: 100%">
+                <pre>
 @JsonSerializer.Serialize(user, indented);
             </pre>
+            </div>
+
             <p>Error: @(ApiResponse??"no")</p>
             <b>User data</b><br />
-            <pre>
-@GetUserInfoAsync(user.access_token)
-            </pre> 
-            <pre>
-@GetUserInfoAsync(user.id_token)
-            </pre>
-            <b>Api data</b><br />
-            <pre>
-@CallServiceAsync(user.access_token, "WeatherForecast")
-            </pre> 
-            <pre>
-@CallServiceAsync(user.id_token, "WeatherForecast")
-            </pre>
-            <b>Policy data</b><br />
-            <pre>
-@CallServiceAsync(user.access_token, "WeatherForecastPolicy")
-            </pre> 
-            <pre>
-CallServiceAsync(user.id_token, "WeatherForecastPolicy")
-            </pre>
+            <button @onclick="GetUserInfoAsync">Get User Data</button>
+            @if (UserData.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <td>Type</td>
+                            <td>Value</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (type, value) in UserData)
+                        {
+                            <tr>
+                                <td>@type</td>
+                                <td>@value</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
 
+            }
+            @if (user is not null && !string.IsNullOrWhiteSpace(user.access_token))
+            {
+                <b>Api data</b><br />
+                <pre>
+                @CallServiceAsync(user.access_token, "WeatherForecast").Result
+                            </pre>
+                <b>Policy data</b><br />
+                <pre>
+                @CallServiceAsync(user.access_token, "WeatherForecastPolicy").Result
+                            </pre>
+            }
         </div>
     </Authorized>
     <NotAuthorized>
@@ -53,6 +68,7 @@ CallServiceAsync(user.id_token, "WeatherForecastPolicy")
     CachedAuthSettings authSettings;
     CognitoUser user;
     string ApiResponse;
+    Dictionary<string, string> UserData = new Dictionary<string, string>();
     protected override async Task OnInitializedAsync()
     {
         string key = "Microsoft.AspNetCore.Components.WebAssembly.Authentication.CachedAuthSettings";
@@ -63,10 +79,17 @@ CallServiceAsync(user.id_token, "WeatherForecastPolicy")
 
 
     }
-    public async Task<Dictionary<string,string>> GetUserInfoAsync(string accessToken)
+
+    public async Task GetUserInfoAsync()
+    {
+        UserData = await GetUserInfoAsync(user.access_token);
+        Console.WriteLine($"finish to get user data: {UserData.Count} rows");
+    }
+    public async Task<Dictionary<string, string>> GetUserInfoAsync(string accessToken)
     {
         try
         {
+
             var client = new HttpClient();
 
             var disco = await client.GetDiscoveryDocumentAsync("https://localhost:44310");
@@ -92,23 +115,22 @@ CallServiceAsync(user.id_token, "WeatherForecastPolicy")
     {
         var baseAddress = "https://localhost:44365";
 
-        var client = new HttpClient
-        {
-            BaseAddress = new Uri(baseAddress)
-        };
+        //var client = Client
+        //{
+        //    BaseAddress = new Uri(baseAddress)
+        //};
 
-        client.SetBearerToken(token);
+        Client.SetBearerToken(token);
 
         try
         {
-            var response = await client.GetStringAsync(controller);
+            var response = await Client.GetStringAsync($"{baseAddress}/{controller}");
             return response;
         }
         catch (Exception e)
         {
             return e.Message;
         }
-
     }
 
     public class CachedAuthSettings
