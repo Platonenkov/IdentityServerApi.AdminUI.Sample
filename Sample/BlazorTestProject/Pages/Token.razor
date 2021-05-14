@@ -1,0 +1,138 @@
+﻿@page "/token"
+@using System.Text.Json
+@using IdentityModel.Client
+@inject IJSRuntime JSRuntime
+
+<AuthorizeView>
+    <Authorized>
+        <div>
+            <b>CachedAuthSettings</b>
+            <pre>
+@JsonSerializer.Serialize(authSettings, indented);
+            </pre>
+            <br />
+            <b>CognitoUser</b><br />
+            <pre>
+@JsonSerializer.Serialize(user, indented);
+            </pre>
+            <p>Error: @(ApiResponse??"no")</p>
+            <b>User data</b><br />
+            <pre>
+@GetUserInfoAsync(user.access_token)
+            </pre> 
+            <pre>
+@GetUserInfoAsync(user.id_token)
+            </pre>
+            <b>Api data</b><br />
+            <pre>
+@CallServiceAsync(user.access_token, "WeatherForecast")
+            </pre> 
+            <pre>
+@CallServiceAsync(user.id_token, "WeatherForecast")
+            </pre>
+            <b>Policy data</b><br />
+            <pre>
+@CallServiceAsync(user.access_token, "WeatherForecastPolicy")
+            </pre> 
+            <pre>
+CallServiceAsync(user.id_token, "WeatherForecastPolicy")
+            </pre>
+
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-warning" role="alert">
+            Everything requires you to <a href="/authentication/login">Log In</a> first.
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    JsonSerializerOptions indented = new JsonSerializerOptions() { WriteIndented = true };
+    CachedAuthSettings authSettings;
+    CognitoUser user;
+    string ApiResponse;
+    protected override async Task OnInitializedAsync()
+    {
+        string key = "Microsoft.AspNetCore.Components.WebAssembly.Authentication.CachedAuthSettings";
+        string authSettingsRAW = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", key);
+        authSettings = JsonSerializer.Deserialize<CachedAuthSettings>(authSettingsRAW);
+        string userRAW = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", authSettings?.OIDCUserKey);
+        user = JsonSerializer.Deserialize<CognitoUser>(userRAW);
+
+
+    }
+    public async Task<Dictionary<string,string>> GetUserInfoAsync(string accessToken)
+    {
+        try
+        {
+            var client = new HttpClient();
+
+            var disco = await client.GetDiscoveryDocumentAsync("https://localhost:44310");
+            if (disco.IsError) throw new Exception(disco.Error);
+
+            var user_data = await client.GetUserInfoAsync(
+                new UserInfoRequest() { Address = disco.UserInfoEndpoint, Token = accessToken });
+
+            if (!user_data.IsError)
+                return user_data.Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
+
+            ApiResponse = user_data.Error;
+            return new Dictionary<string, string>();
+        }
+        catch (Exception e)
+        {
+            ApiResponse = e.Message;
+        }
+        return new Dictionary<string, string>();
+    }
+
+    public async Task<string> CallServiceAsync(string token, string controller)
+    {
+        var baseAddress = "https://localhost:44365";
+
+        var client = new HttpClient
+        {
+            BaseAddress = new Uri(baseAddress)
+        };
+
+        client.SetBearerToken(token);
+
+        try
+        {
+            var response = await client.GetStringAsync(controller);
+            return response;
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
+
+    }
+
+    public class CachedAuthSettings
+    {
+        public string authority { get; set; }
+        public string metadataUrl { get; set; }
+        public string client_id { get; set; }
+        public string[] defaultScopes { get; set; }
+        public string redirect_uri { get; set; }
+        public string post_logout_redirect_uri { get; set; }
+        public string response_type { get; set; }
+        public string response_mode { get; set; }
+        public string scope { get; set; }
+
+        public string OIDCUserKey => $"oidc.user:{authority}:{client_id}";
+    }
+
+    public class CognitoUser
+    {
+        public string id_token { get; set; }
+        public string access_token { get; set; }
+        public string refresh_token { get; set; }
+        public string token_type { get; set; }
+        public string scope { get; set; }
+        public int expires_at { get; set; }
+    }
+}
