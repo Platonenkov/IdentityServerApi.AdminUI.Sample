@@ -2,24 +2,23 @@
 @using System.Text.Json
 @using IdentityModel.Client
 @inject IJSRuntime JSRuntime
-@inject HttpClient Client 
+@inject HttpClient Client
 <AuthorizeView>
     <Authorized>
-        <div>
+        <div style="width: 90vw">
             <b>CachedAuthSettings</b>
             <pre>
-@JsonSerializer.Serialize(authSettings, indented);
+                @JsonSerializer.Serialize(authSettings, indented);
             </pre>
             <br />
             <b>CognitoUser</b><br />
-            <div style="width: 100%">
+            <div>
                 <pre>
-@JsonSerializer.Serialize(user, indented);
+                @JsonSerializer.Serialize(user, indented);
             </pre>
             </div>
 
             <p>Error: @(ApiResponse??"no")</p>
-            <b>User data</b><br />
             <button @onclick="GetUserInfoAsync">Get User Data</button>
             @if (UserData.Any())
             {
@@ -42,16 +41,17 @@
                 </table>
 
             }
+            <br />
             @if (user is not null && !string.IsNullOrWhiteSpace(user.access_token))
             {
-                <b>Api data</b><br />
+                <button @onclick="()=>CallServiceAsync(user.access_token)">Get api</button>
                 <pre>
-                @CallServiceAsync(user.access_token, "WeatherForecast").Result
-                            </pre>
+                    @ApiData
+                </pre>
                 <b>Policy data</b><br />
                 <pre>
-                @CallServiceAsync(user.access_token, "WeatherForecastPolicy").Result
-                            </pre>
+                    @ApiPoliceData
+                </pre>
             }
         </div>
     </Authorized>
@@ -68,6 +68,8 @@
     CachedAuthSettings authSettings;
     CognitoUser user;
     string ApiResponse;
+    string ApiData=string.Empty;
+    string ApiPoliceData = string.Empty;
     Dictionary<string, string> UserData = new Dictionary<string, string>();
     protected override async Task OnInitializedAsync()
     {
@@ -111,6 +113,11 @@
         return new Dictionary<string, string>();
     }
 
+    public async Task CallServiceAsync(string token)
+    {
+        ApiData = await @CallServiceAsync(user.access_token, "WeatherForecast");
+        ApiPoliceData = await @CallServiceAsync(user.access_token, "WeatherForecastPolicy");
+    }
     public async Task<string> CallServiceAsync(string token, string controller)
     {
         var baseAddress = "https://localhost:44365";
